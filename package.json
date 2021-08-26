@@ -1,0 +1,21 @@
+{
+  "name": "@qlean/adm-cli",
+  "author": "Andrey Ustyumenko",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:ts": "tsc"
+  },
+  "bin": {
+    "adm-cli": "./bin/adm-cli.js"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "dependencies": {
+    "@types/inquirer": "^7.3.3",
+    "commander": "^8.1.0",
+    "inquirer": "^8.1.2",
+    "typescript": "^4.3.5"
+  }
+}
