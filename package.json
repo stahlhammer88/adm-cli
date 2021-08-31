@@ -5,7 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:ts": "tsc"
+    "build:ts": "tsc && yarn run copy:static",
+    "copy:static": "cpx --include-empty-dirs  \"./src/**/!(*.ts)\" build"
   },
   "bin": {
     "adm-cli": "./bin/adm-cli.js"
@@ -13,9 +14,15 @@
   "keywords": [],
   "license": "MIT",
   "dependencies": {
+    "@types/handlebars": "^4.1.0",
     "@types/inquirer": "^7.3.3",
+    "@types/mkdirp": "^1.0.2",
     "commander": "^8.1.0",
+    "cpx": "^1.5.0",
+    "handlebars": "^4.7.7",
     "inquirer": "^8.1.2",
+    "mkdirp": "^1.0.4",
+    "mobx": "^6.3.2",
     "typescript": "^4.3.5"
   }
 }

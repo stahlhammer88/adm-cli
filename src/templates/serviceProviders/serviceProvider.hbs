@@ -1,0 +1,58 @@
+import GrpcService, { PlatformAdminApi } from 'src/services/GrpcService';
+
+import {
+  ICreate,
+  ISearch,
+  IUpdate,
+  IRestore,
+  IFindById,
+  IRemove,
+} from 'src/services/ServiceLocator/ServiceLocator.interface';
+import { RequestController } from 'src/utils/decorators/request-controller';
+
+class {{serviceClassName}}ServiceProvider implements ISearch, ICreate, IUpdate, IRestore, IFindById, IRemove {
+  @RequestController({ logger: true, retry: true, debounce: true })
+  search(
+    params: PlatformAdminApi.,
+  ): Promise<PlatformAdminApi.> {
+    return GrpcService.{{serviceClassName}}Service.Search(params);
+  }
+
+  @RequestController({ logger: true, retry: true, debounce: true })
+  create(
+    params: PlatformAdminApi.,
+  ): Promise<PlatformAdminApi.> {
+    return GrpcService.{{serviceClassName}}.Upsert(params);
+  }
+
+  @RequestController({ logger: true, retry: true, debounce: true })
+  update(
+    params: PlatformAdminApi.,
+  ): Promise<PlatformAdminApi.> {
+    return GrpcService.{{serviceClassName}}.Upsert(params);
+  }
+
+  @RequestController({ logger: true, retry: true, debounce: true })
+  restore(
+    params: PlatformAdminApi.,
+  ): Promise<PlatformAdminApi.> {
+    return GrpcService.{{serviceClassName}}.Restore(params);
+  }
+
+  @RequestController({ logger: true, retry: true, debounce: true })
+  remove(
+    params: PlatformAdminApi.,
+  ): Promise<PlatformAdminApi.> {
+    return GrpcService.{{serviceClassName}}.Remove(params);
+  }
+
+  @RequestController({ logger: true, retry: true, debounce: true })
+  findById(
+    params: PlatformAdminApi.,
+  ): Promise<PlatformAdminApi.> {
+    return GrpcService.{{serviceClassName}}.FindById(params);
+  }
+}
+
+export const {{serviceCamel}}ServiceProvider = new {{serviceClassName}}ServiceProvider();
+export type T{{serviceClassName}}ServiceProvider = typeof {{serviceCamel}}ServiceProvider;

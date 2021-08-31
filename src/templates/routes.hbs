@@ -1,0 +1,11 @@
+import { lazy } from 'src/utils';
+import { IRoute } from '../../routes';
+
+export default (fallback: JSX.Element): IRoute[] => [
+  {
+    path: '/{{moduleName}}/',
+    pureComponent: lazy(() => import(''), fallback),
+    breadcrumb: '',
+    exact: true,
+  },
+];

@@ -1,0 +1,12 @@
+import { AppModule, IRoute, Menu } from 'src/interfaces';
+import routes from './{{moduleNameCamel}}.routes';
+import menu from './{{moduleNameCamel}}.menu';
+
+
+class {{className}}Module extends AppModule {
+  public routes = (fallback: JSX.Element): IRoute[] => routes(fallback);
+  public menu = (): Menu[] => menu();
+  public providers = [];
+}
+
+export const {{moduleNameCamel}}Module = new {{className}}Module();

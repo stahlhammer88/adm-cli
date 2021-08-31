@@ -1,0 +1,184 @@
+import { BaseFetchStore } from 'src/store/BaseFetch.store';
+import { BaseShortPageStore } from 'src/features/ShortPage/BaseShortPage.store';
+import { action, makeObservable, runInAction } from 'mobx';
+import { logger } from '@qlean/front-logger';
+import { PlatformAdminApi } from 'src/services/GrpcService';
+import { CATALOGS_PROVIDER_TOKENS } from 'src/modules/catalogs/constants';
+import { T{{dataType}}ServiceProvider } from 'src/modules/catalogs/service-providers/{{serviceClassName}}Service.provider';
+import { DEFAULT_SEARCH_OPTIONS } from 'src/constants';
+import { ICommonSearch } from 'src/interfaces';
+
+type T{{dataType}} = PlatformAdminApi.I{{dataType}};
+type T{{dataType}}WhereFields = PlatformAdminApi.Search{{dataType}}Request.IWhereFields;
+
+const { serviceLocator } = BaseFetchStore;
+const { {{serviceNameCaps}}_SERVICE } = CATALOGS_PROVIDER_TOKENS;
+
+export default class {{pageClassName}}Store extends BaseShortPageStore<T{{dataType}}> {
+  private {{serviceName}}Service: T{{dataType}}ServiceProvider = serviceLocator.get({{serviceNameCaps}}_SERVICE);
+
+  constructor() {
+    super();
+    makeObservable(this);
+  }
+
+  @action create = (args: PlatformAdminApi.): Promise<T{{dataType}}> => {
+    this.isEntityLoading = true;
+
+    return this.{{serviceName}}Service
+      .create(args)
+      .then((createdEntity) => {
+        runInAction(() => {
+          this.setCurrentEntity(createdEntity);
+        });
+
+        return createdEntity;
+      })
+      .catch((err) => {
+        logger.error('--err-create{{dataType}}-', err);
+
+        return {} as T{{dataType}};
+      })
+      .finally(() => {
+        runInAction(() => {
+          this.isEntityLoading = false;
+        });
+      });
+  };
+
+  @action update = (args: PlatformAdminApi.): Promise<T{{dataType}}> => {
+    this.isEntityLoading = true;
+
+    const req = {
+      ...args,
+      id: this.currentEntity?.id,
+    };
+
+    return this.{{serviceName}}Service
+      .update(req)
+      .then((updatedEntity) => {
+        runInAction(() => {
+          this.setCurrentEntity(updatedEntity);
+        });
+
+        return updatedEntity;
+      })
+      .catch((err) => {
+        logger.error('--err-update{{dataType}}-', err);
+
+        return {} as T{{dataType}};
+      })
+      .finally(() => {
+        runInAction(() => {
+          this.isEntityLoading = false;
+        });
+      });
+  };
+
+  @action findById = (id: string): Promise<T{{dataType}}> => {
+    this.isEntityLoading = true;
+    this.currentEntity = undefined;
+
+    return this.{{serviceName}}Service
+      .findById({ id })
+      .then((found{{dataType}}) => {
+        runInAction(() => {
+          this.currentEntity = found{{dataType}};
+        });
+
+        return found{{dataType}};
+      })
+      .catch((error) => {
+        logger.error('-err-find{{dataType}}-', error);
+
+        return {} as T{{dataType}};
+      })
+      .finally(() => {
+        runInAction(() => {
+          this.isEntityLoading = false;
+        });
+      });
+  };
+
+  @action search = (args: ICommonSearch<T{{dataType}}WhereFields> = DEFAULT_SEARCH_OPTIONS): Promise<T{{dataType}}[]> => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { searchText, ...rest } = args;
+    this.isListLoading = true;
+
+    return this.{{serviceName}}Service
+      .search(rest)
+      .then((res) => {
+        const { page = 0, limit = 0, total = 10, data = [] } = res;
+
+        runInAction(() => {
+          this.limit = limit as number;
+          this.total = total as number;
+          this.page = page as number;
+          this.entities = data as T{{dataType}}[];
+        });
+
+        return res.data as T{{dataType}}[];
+      })
+      .catch((error) => {
+        logger.error('-err-search{{dataType}}-', error);
+        runInAction(() => {
+          this.entities = [];
+        });
+
+        return [];
+      })
+      .finally(() => {
+        runInAction(() => {
+          this.isListLoading = false;
+        });
+      });
+  };
+
+  @action remove = (id: string): Promise<T{{dataType}}> => {
+    this.isEntityLoading = true;
+
+    return this.{{serviceName}}Service
+      .remove({ id })
+      .then((removed{{dataType}}) => {
+        runInAction(() => {
+          this.setCurrentEntity(removed{{dataType}});
+        });
+
+        return remove{{dataType}};
+      })
+      .catch((error) => {
+        logger.error('-err-remove{{dataType}}-', error);
+
+        return {} as T{{dataType}};
+      })
+      .finally(() => {
+        runInAction(() => {
+          this.isEntityLoading = false;
+        });
+      });
+  };
+
+  @action restore = (id: string): Promise<T{{dataType}}> => {
+    this.isEntityLoading = true;
+
+    return this.{{serviceName}}Service
+      .restore({ id })
+      .then((restored{{dataType}}) => {
+        runInAction(() => {
+          this.setCurrentEntity(restored{{dataType}});
+        });
+
+        return restored{{dataType}} as T{{dataType}};
+      })
+      .catch((error) => {
+        logger.error('-err-restore{{dataType}}-', error);
+
+        return {} as T{{dataType}};
+      })
+      .finally(() => {
+        runInAction(() => {
+          this.isEntityLoading = false;
+        });
+      });
+  };
+}

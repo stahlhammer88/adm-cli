@@ -1,5 +1,7 @@
 import * as path from "path";
-const mkdirp = require("mkdirp");
+import * as mkdirp from "mkdirp";
+import * as fs from "fs";
+import handlebars from "handlebars";
 
 export const getCurrentProccesPath = () => {
   return process.cwd();
@@ -18,22 +20,55 @@ export const convertKebabToCamelCase = (kebabCaseString: string) => {
     .join("");
 };
 
+export const convertCamelToPascal = (camelCaseString: string) => {
+  return `${camelCaseString[0].toUpperCase()}${camelCaseString.slice(1)}`;
+}
+
+
 export const createFolderStructure = (options: {
   rootPath: string;
   paths: string[];
-}): Promise<void> => {
-  return new Promise((res, rej) => {
+}): Promise<string[]> => {
+  return Promise.all(
     options.paths.map((innerPath) => {
-      const endPath = path.resolve(options.rootPath, innerPath);
-      mkdirp(endPath, (err: Error) => {
-        if (err) {
-          rej(err);
-        } else {
-          console.log(`-- mkdir for path ${endPath} done.`);
-        }
-      });
-    });
+      let endPath = "";
+      if (innerPath.includes("->")) {
+        const [...paths] = innerPath.split("->");
+        endPath = path.resolve(options.rootPath, ...paths);
+      } else {
+        endPath = path.resolve(options.rootPath, innerPath);
+      }
 
-    res();
+      return new Promise<string>((resolve, reject) => {
+        mkdirp(endPath)
+          .then(() => {
+            console.log(`-- mkdir for path ${endPath} done.`);
+            resolve(endPath);
+          })
+          .catch((err) => {
+            console.error(err);
+            reject();
+          });
+      });
+    })
+  );
+};
+
+export const uploadFileByTemplate = (options: {
+  from: string;
+  to: string;
+  data: any;
+}) => {
+  const { from, to, data } = options;
+  fs.readFile(from, "utf-8", (error: Error, source: any) => {
+    if (error) {
+      return error;
+    }
+
+    var template = handlebars.compile(source);
+    var text = template(data);
+    fs.writeFileSync(to, text);
+
+    return;
   });
 };

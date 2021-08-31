@@ -3,11 +3,30 @@
 import { Command } from "commander";
 import { ModuleBuilder } from "../module-builder/ModuleBuilder";
 const program = new Command();
+const moduleBuilder = new ModuleBuilder();
 
 program
   .command("add-module")
-  .action((moduleName) => {
-    const moduleBuilder = new ModuleBuilder();
-    moduleBuilder.init();
+  .action(() => {
+    moduleBuilder.createModule();
   })
-  .parse(process.argv);
+
+program
+  .command("add-page")
+  .action(() => {
+    moduleBuilder.startPagesDialogue();
+  })
+
+program
+  .command("add-short-page")
+  .action(() => {
+    moduleBuilder.createShortPage();
+  })
+
+program
+  .command("add-service-provider")
+  .action(() => {
+    moduleBuilder.startServiceDialogue();
+  })
+
+program.parse(process.argv);

@@ -1,0 +1,22 @@
+import React, { FC } from 'react';
+import { ShortPage } from 'src/features/ShortPage';
+import { {{pageClassName}}Configurations } from './config';
+import {{pageClassName}}Store from './stores/{{pageClassName}}Store';
+
+const {{pageClassName}}Page: FC = (): JSX.Element => {
+  const store = new {{pageClassName}}Store();
+
+  return (
+    <div className="h-100">
+      <ShortPage
+        store={store}
+        listViewConfig={ {{pageClassName}}Configurations.ListViewConfig()}
+        cardConfig={ {{pageClassName}}Configurations.CardConfig()}
+        createFormConfig={ {{pageClassName}}Configurations.CreateFormConfig()}
+        updateFormConfig={ {{pageClassName}}Configurations.UpdateFormConfig()}
+      />
+    </div>
+  );
+};
+
+export default {{pageClassName}}Page;
