@@ -22,35 +22,35 @@ class {{serviceClassName}}ServiceProvider implements ISearch, ICreate, IUpdate, 
   create(
     params: PlatformAdminApi.,
   ): Promise<PlatformAdminApi.> {
-    return GrpcService.{{serviceClassName}}.Upsert(params);
+    return GrpcService.{{serviceClassName}}Service.Create(params);
   }
 
   @RequestController({ logger: true, retry: true, debounce: true })
   update(
     params: PlatformAdminApi.,
   ): Promise<PlatformAdminApi.> {
-    return GrpcService.{{serviceClassName}}.Upsert(params);
+    return GrpcService.{{serviceClassName}}Service.Update(params);
   }
 
   @RequestController({ logger: true, retry: true, debounce: true })
   restore(
     params: PlatformAdminApi.,
   ): Promise<PlatformAdminApi.> {
-    return GrpcService.{{serviceClassName}}.Restore(params);
+    return GrpcService.{{serviceClassName}}Service.Restore(params);
   }
 
   @RequestController({ logger: true, retry: true, debounce: true })
   remove(
     params: PlatformAdminApi.,
   ): Promise<PlatformAdminApi.> {
-    return GrpcService.{{serviceClassName}}.Remove(params);
+    return GrpcService.{{serviceClassName}}Service.Remove(params);
   }
 
   @RequestController({ logger: true, retry: true, debounce: true })
   findById(
     params: PlatformAdminApi.,
   ): Promise<PlatformAdminApi.> {
-    return GrpcService.{{serviceClassName}}.FindById(params);
+    return GrpcService.{{serviceClassName}}Service.FindById(params);
   }
 }
 
