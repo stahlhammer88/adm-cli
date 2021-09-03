@@ -6,7 +6,18 @@ export class ActionCreator {
       {
         name: "moduleName",
         type: "input",
-        message: "Enter the module name in kebab-case",
+        message: "Enter the new module name in kebab-case",
+        validate: this.kebabValidation,
+      },
+    ]);
+  }
+
+  public async createSubModuleAction(): Promise<{ moduleName: string }> {
+    return await prompt([
+      {
+        name: "moduleName",
+        type: "input",
+        message: "Enter the module name you want to place the sub-module in (in kebab-case)",
         validate: this.kebabValidation,
       },
     ]);

@@ -29,4 +29,10 @@ program
     moduleBuilder.startServiceDialogue();
   })
 
+program
+  .command("add-sub-module")
+  .action(() => {
+    moduleBuilder.createSubModule();
+  })
+
 program.parse(process.argv);

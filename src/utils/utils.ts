@@ -22,8 +22,7 @@ export const convertKebabToCamelCase = (kebabCaseString: string) => {
 
 export const convertCamelToPascal = (camelCaseString: string) => {
   return `${camelCaseString[0].toUpperCase()}${camelCaseString.slice(1)}`;
-}
-
+};
 
 export const createFolderStructure = (options: {
   rootPath: string;
@@ -52,6 +51,28 @@ export const createFolderStructure = (options: {
       });
     })
   );
+};
+
+export const findFolderPath = (
+  rootPath: string,
+  folderName: string,
+  resultPath: string = ""
+) => {
+  const folders: string[] = fs.readdirSync(rootPath);
+
+  for (let i = 0; i < folders.length; i++) {
+    const folder = folders[i];
+    const currentPath = path.resolve(rootPath, folderName);
+
+    if (folder === folderName) {
+      resultPath = currentPath;
+      break;
+    } else {
+      findFolderPath(currentPath, folderName, resultPath);
+    }
+  }
+
+  return resultPath;
 };
 
 export const uploadFileByTemplate = (options: {

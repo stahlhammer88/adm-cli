@@ -1,3 +1,4 @@
+import { findFolderPath } from './../utils/utils';
 import { ActionCreator } from "./ActionCreator";
 import {
   getCurrentProccesPath,
@@ -15,8 +16,9 @@ export class ModuleBuilder {
   private pageName: string = "";
   private dataType: string = "";
   private serviceName: string = "";
-  private currentPageDirPath: string = ''
-  private currentStoreDirPath: string = ''
+  private currentPageDirPath: string = "";
+  private currentStoreDirPath: string = "";
+  private innerRootModule: string = "";
   private actionCreator: ActionCreator;
 
   constructor() {
@@ -24,9 +26,13 @@ export class ModuleBuilder {
     this.actionCreator = new ActionCreator();
   }
 
-  private get modulesFolder() {
+  private get rootModuleFolder() {
     const currentProjectPath = getCurrentProccesPath();
     return path.resolve(currentProjectPath, "web", "src", "modules");
+  }
+
+  private get innerRootModuleFolder() {
+    return findFolderPath(this.rootModuleFolder, this.innerRootModule)
   }
 
   private get moduleNameCamel() {
@@ -34,11 +40,11 @@ export class ModuleBuilder {
   }
 
   private get modulePath() {
-    return path.resolve(this.modulesFolder, this.moduleName);
+    return path.resolve(this.rootModuleFolder, this.moduleName);
   }
 
   private get className() {
-    return convertCamelToPascal(this.moduleName);
+    return convertCamelToPascal(this.moduleNameCamel);
   }
 
   private get pageClassName() {
@@ -79,9 +85,62 @@ export class ModuleBuilder {
     );
 
     await createFolderStructure({
-      rootPath: this.modulesFolder,
+      rootPath: this.rootModuleFolder,
       paths: [this.moduleName],
     });
+
+    uploadFileByTemplate({
+      from: path.resolve(__dirname, "../templates/module.hbs"),
+      to: moduleMainPath,
+      data: {
+        className: this.className,
+        moduleNameCamel: this.moduleNameCamel,
+      },
+    });
+    uploadFileByTemplate({
+      from: path.resolve(__dirname, "../templates/menu.hbs"),
+      to: moduleMenuPath,
+      data: {
+        moduleName: this.moduleName,
+      },
+    });
+    uploadFileByTemplate({
+      from: path.resolve(__dirname, "../templates/routes.hbs"),
+      to: moduleRoutesPath,
+      data: {
+        moduleName: this.moduleName,
+      },
+    });
+  }
+
+  async createSubModule() {
+    const { moduleName: rootModuleName } =
+      await this.actionCreator.createSubModuleAction();
+    const { moduleName: newModuleName } =
+      await this.actionCreator.createModuleAction();
+
+    this.innerRootModule = rootModuleName;
+    this.moduleName = newModuleName;
+
+    await createFolderStructure({
+      rootPath: this.innerRootModuleFolder,
+      paths: ['modules', `${this.moduleName}`, `${this.moduleName}->pages`, `${this.moduleName}->service-providers`],
+    });
+
+    const innerModulePath = path.resolve(this.innerRootModuleFolder, this.moduleName)
+
+    const moduleMainPath = path.resolve(
+      innerModulePath,
+      `${this.moduleNameCamel}.module.ts`
+    );
+    const moduleRoutesPath = path.resolve(
+      innerModulePath,
+      `${this.moduleNameCamel}.routes.ts`
+    );
+    const moduleMenuPath = path.resolve(
+      innerModulePath,
+      `${this.moduleNameCamel}.menu.ts`
+    );
 
     uploadFileByTemplate({
       from: path.resolve(__dirname, "../templates/module.hbs"),
@@ -121,10 +180,13 @@ export class ModuleBuilder {
     const { moduleName } = await this.actionCreator.createModuleAction();
     const { serviceName } = await this.actionCreator.createServiceAction();
 
-    this.serviceName = serviceName
-    this.moduleName = moduleName
+    this.serviceName = serviceName;
+    this.moduleName = moduleName;
 
-    const serviceProvidersDirPath = path.resolve(this.modulePath, 'service-providers')
+    const serviceProvidersDirPath = path.resolve(
+      this.modulePath,
+      "service-providers"
+    );
 
     const serviceProviderPath = path.resolve(
       serviceProvidersDirPath,
@@ -132,7 +194,10 @@ export class ModuleBuilder {
     );
 
     uploadFileByTemplate({
-      from: path.resolve(__dirname, "../templates/serviceProviders/serviceProvider.hbs"),
+      from: path.resolve(
+        __dirname,
+        "../templates/serviceProviders/serviceProvider.hbs"
+      ),
       to: serviceProviderPath,
       data: {
         serviceClassName: this.serviceClassName,
@@ -151,8 +216,8 @@ export class ModuleBuilder {
       ],
     });
     const [, currentPageDirPath, currentStoreDirPath] = innerPaths;
-    this.currentPageDirPath = currentPageDirPath
-    this.currentStoreDirPath = currentStoreDirPath
+    this.currentPageDirPath = currentPageDirPath;
+    this.currentStoreDirPath = currentStoreDirPath;
 
     const pagePath = path.resolve(
       this.currentPageDirPath,
@@ -187,7 +252,7 @@ export class ModuleBuilder {
         dataType: this.dataTypePascal,
         serviceClassName: this.serviceClassName,
         serviceName: this.serviceName,
-        serviceNameCaps: this.serviceNameCaps
+        serviceNameCaps: this.serviceNameCaps,
       },
     });
   }
@@ -205,13 +270,13 @@ export class ModuleBuilder {
 
     await this.createInnerPages(true);
 
-    const configPath = path.resolve(
-      this.currentPageDirPath,
-      `config.ts`
-    );
+    const configPath = path.resolve(this.currentPageDirPath, `config.ts`);
 
     uploadFileByTemplate({
-      from: path.resolve(__dirname, "../templates/baseShortPageFiles/config.hbs"),
+      from: path.resolve(
+        __dirname,
+        "../templates/baseShortPageFiles/config.hbs"
+      ),
       to: configPath,
       data: {
         pageClassName: this.pageClassName,
